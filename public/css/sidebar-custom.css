@@ -1,0 +1,452 @@
+/* =====================================================
+   SGC DESA LESANE — CUSTOM SIDEBAR DESIGN
+   Modern & Clean Sidebar Styling
+   ===================================================== */
+
+/* ── Sidebar Container ──────────────────────────────── */
+.fi-sidebar {
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
+    border-right: 1px solid rgba(148, 163, 184, 0.1) !important;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+/* ── Sidebar Header / Brand ─────────────────────────── */
+.fi-sidebar-header {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.15) !important;
+    padding: 1.5rem 1.25rem !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+.fi-sidebar-header .fi-logo {
+    filter: brightness(1.2) !important;
+}
+
+.fi-sidebar-header .fi-brand-name {
+    color: #f1f5f9 !important;
+    font-weight: 700 !important;
+    font-size: 1.125rem !important;
+    letter-spacing: -0.01em !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Fix brand text color - ensure it's visible */
+.fi-sidebar-header a,
+.fi-sidebar-header span {
+    color: #f1f5f9 !important;
+}
+
+/* ── Navigation Groups ──────────────────────────────── */
+.fi-sidebar-nav-groups {
+    padding: 1rem 0 !important;
+}
+
+/* Group Label */
+.fi-sidebar-group-label {
+    color: #94a3b8 !important;
+    font-size: 0.6875rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    padding: 1rem 1.25rem 0.5rem !important;
+    margin-top: 0.5rem !important;
+}
+
+/* Group Collapse Button */
+.fi-sidebar-group > button {
+    color: #cbd5e1 !important;
+    transition: all 0.2s ease !important;
+    margin: 0.125rem 0.75rem !important;
+    border-radius: 0.625rem !important;
+    padding: 0.625rem 1rem !important;
+    padding-left: 1rem !important;
+}
+
+.fi-sidebar-group > button:hover {
+    background-color: rgba(148, 163, 184, 0.1) !important;
+    color: #f1f5f9 !important;
+}
+
+/* ── Navigation Items ───────────────────────────────── */
+.fi-sidebar-item {
+    margin: 0.125rem 0.75rem !important;
+}
+
+/* Standalone menu items (like Dashboard) - same margin as groups */
+.fi-sidebar-nav > .fi-sidebar-item {
+    margin: 0.125rem 0.75rem !important;
+}
+
+.fi-sidebar-item-button {
+    border-radius: 0.625rem !important;
+    padding: 0.625rem 1rem !important;
+    padding-left: 1rem !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Nav Item Icon */
+.fi-sidebar-item-icon {
+    color: #94a3b8 !important;
+    transition: all 0.2s ease !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+}
+
+/* Nav Item Label */
+.fi-sidebar-item-label {
+    color: #cbd5e1 !important;
+    font-weight: 500 !important;
+    font-size: 0.875rem !important;
+    transition: all 0.2s ease !important;
+}
+
+/* Nav Item Badge */
+.fi-sidebar-item-badge {
+    background: rgba(59, 130, 246, 0.2) !important;
+    color: #93c5fd !important;
+    font-size: 0.6875rem !important;
+    font-weight: 600 !important;
+    padding: 0.125rem 0.5rem !important;
+    border-radius: 999px !important;
+}
+
+/* ── Hover State ────────────────────────────────────── */
+.fi-sidebar-item:hover .fi-sidebar-item-button {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%) !important;
+    transform: translateX(4px) !important;
+}
+
+.fi-sidebar-item:hover .fi-sidebar-item-icon {
+    color: #60a5fa !important;
+    transform: scale(1.1) !important;
+}
+
+.fi-sidebar-item:hover .fi-sidebar-item-label {
+    color: #f1f5f9 !important;
+}
+
+/* ── Active State ───────────────────────────────────── */
+.fi-sidebar-item-button.fi-active {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.25) 0%, rgba(37, 99, 235, 0.2) 100%) !important;
+    border-left: 4px solid #3b82f6 !important;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2), inset 0 0 0 1px rgba(59, 130, 246, 0.2) !important;
+    position: relative !important;
+}
+
+.fi-sidebar-item-button.fi-active::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    background: linear-gradient(90deg, rgba(59, 130, 246, 0.15) 0%, transparent 100%) !important;
+    pointer-events: none !important;
+}
+
+/* Active indicator dot */
+.fi-sidebar-item-button.fi-active::after {
+    content: '' !important;
+    position: absolute !important;
+    left: -2px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 8px !important;
+    height: 8px !important;
+    background: #60a5fa !important;
+    border-radius: 50% !important;
+    box-shadow: 0 0 8px rgba(96, 165, 250, 0.6) !important;
+}
+
+.fi-sidebar-item-button.fi-active .fi-sidebar-item-icon {
+    color: #60a5fa !important;
+    filter: drop-shadow(0 0 4px rgba(96, 165, 250, 0.4)) !important;
+}
+
+.fi-sidebar-item-button.fi-active .fi-sidebar-item-label {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ── Collapsible Groups ─────────────────────────────── */
+.fi-sidebar-group-items {
+    padding-left: 0.5rem !important;
+    background: rgba(15, 23, 42, 0.4) !important;
+    border-radius: 0.5rem !important;
+    margin: 0.25rem 0.5rem !important;
+    padding: 0.5rem 0.5rem !important;
+}
+
+/* Parent group button when has active child */
+.fi-sidebar-group:has(.fi-sidebar-item-button.fi-active) > button,
+.fi-sidebar-group:has(.fi-sidebar-item-button.sgc-active) > button,
+.fi-sidebar-group.sgc-group-active > button {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(37, 99, 235, 0.1) 100%) !important;
+    color: #93c5fd !important;
+    border-left: 3px solid rgba(59, 130, 246, 0.5) !important;
+    border-radius: 0.625rem !important;
+    padding-left: 1rem !important;
+}
+
+/* Parent group icon when has active child - GREEN to match submenu */
+.fi-sidebar-group:has(.fi-sidebar-item-button.fi-active) > button svg,
+.fi-sidebar-group:has(.fi-sidebar-item-button.sgc-active) > button svg,
+.fi-sidebar-group.sgc-group-active > button svg {
+    color: #4ade80 !important;
+    filter: drop-shadow(0 0 4px rgba(74, 222, 128, 0.6)) !important;
+}
+
+/* Parent group items container when has active child */
+.fi-sidebar-group:has(.fi-sidebar-item-button.fi-active) .fi-sidebar-group-items,
+.fi-sidebar-group:has(.fi-sidebar-item-button.sgc-active) .fi-sidebar-group-items,
+.fi-sidebar-group.sgc-group-active .fi-sidebar-group-items {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.6) 100%) !important;
+    border: 1px solid rgba(59, 130, 246, 0.2) !important;
+    box-shadow: inset 0 0 12px rgba(59, 130, 246, 0.1) !important;
+}
+
+.fi-sidebar-group-items .fi-sidebar-item {
+    margin: 0.125rem 0.25rem !important;
+}
+
+/* Reset submenu button - default state (non-active) */
+.fi-sidebar-group-items .fi-sidebar-item-button {
+    padding-left: 2.5rem !important;
+    background: transparent !important;
+    border-left: 2px solid transparent !important;
+    border-radius: 0.5rem !important;
+}
+
+/* Submenu Item Label - Make it visible */
+.fi-sidebar-group-items .fi-sidebar-item-label {
+    color: #cbd5e1 !important;
+}
+
+/* Submenu Hover State */
+.fi-sidebar-group-items .fi-sidebar-item:hover .fi-sidebar-item-button {
+    background: linear-gradient(135deg, rgba(51, 65, 85, 0.7) 0%, rgba(30, 41, 59, 0.6) 100%) !important;
+    border-left: 2px solid rgba(100, 116, 139, 0.5) !important;
+    transform: translateX(4px) !important;
+}
+
+.fi-sidebar-group-items .fi-sidebar-item:hover .fi-sidebar-item-label {
+    color: #f1f5f9 !important;
+}
+
+.fi-sidebar-group-items .fi-sidebar-item:hover .fi-sidebar-item-icon {
+    color: #94a3b8 !important;
+}
+
+/* Submenu Active State - High contrast with solid background */
+/* Multiple selectors to ensure it works */
+.fi-sidebar-group-items .fi-sidebar-item-button.fi-active,
+.fi-sidebar-group-items .fi-sidebar-item-button[aria-current="page"],
+.fi-sidebar-group-items .fi-sidebar-item-button[data-active="true"],
+.fi-sidebar-group-items .fi-sidebar-item .fi-active,
+.fi-sidebar-group-items li[aria-current="page"] .fi-sidebar-item-button,
+.fi-sidebar-group-items .fi-sidebar-item-button.sgc-active {
+    background: linear-gradient(135deg, rgba(71, 85, 105, 0.9) 0%, rgba(51, 65, 85, 0.85) 100%) !important;
+    border-left: 4px solid #22c55e !important;
+    box-shadow: 0 4px 16px rgba(34, 197, 94, 0.3), inset 0 0 0 1px rgba(71, 85, 105, 0.5) !important;
+    transform: translateX(4px) !important;
+}
+
+/* Submenu active indicator - REMOVED (no dot) */
+.fi-sidebar-group-items .fi-sidebar-item-button.fi-active::after,
+.fi-sidebar-group-items .fi-sidebar-item-button[aria-current="page"]::after,
+.fi-sidebar-group-items .fi-sidebar-item-button[data-active="true"]::after,
+.fi-sidebar-group-items li[aria-current="page"] .fi-sidebar-item-button::after,
+.fi-sidebar-group-items .fi-sidebar-item-button.sgc-active::after {
+    display: none !important;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: translateY(-50%) scale(1);
+    }
+    50% {
+        opacity: 0.9;
+        transform: translateY(-50%) scale(1.05);
+    }
+}
+
+.fi-sidebar-group-items .fi-sidebar-item-button.fi-active .fi-sidebar-item-label,
+.fi-sidebar-group-items .fi-sidebar-item-button[aria-current="page"] .fi-sidebar-item-label,
+.fi-sidebar-group-items .fi-sidebar-item-button[data-active="true"] .fi-sidebar-item-label,
+.fi-sidebar-group-items li[aria-current="page"] .fi-sidebar-item-label,
+.fi-sidebar-group-items .fi-sidebar-item-button.sgc-active .fi-sidebar-item-label {
+    color: #ffffff !important;
+    font-weight: 500 !important;
+}
+
+.fi-sidebar-group-items .fi-sidebar-item-button.fi-active .fi-sidebar-item-icon,
+.fi-sidebar-group-items .fi-sidebar-item-button[aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-group-items .fi-sidebar-item-button[data-active="true"] .fi-sidebar-item-icon,
+.fi-sidebar-group-items li[aria-current="page"] .fi-sidebar-item-icon,
+.fi-sidebar-group-items .fi-sidebar-item-button.sgc-active .fi-sidebar-item-icon {
+    color: #4ade80 !important;
+}
+
+/* Submenu Hover State */
+.fi-sidebar-group-items .fi-sidebar-item:hover .fi-sidebar-item-label {
+    color: #f1f5f9 !important;
+}
+
+/* ── Scrollbar ──────────────────────────────────────── */
+.fi-sidebar-nav::-webkit-scrollbar {
+    width: 6px !important;
+}
+
+.fi-sidebar-nav::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+.fi-sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3) !important;
+    border-radius: 3px !important;
+    transition: background 0.2s ease !important;
+}
+
+.fi-sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.5) !important;
+}
+
+/* ── Sidebar Footer ─────────────────────────────────── */
+.fi-sidebar-footer {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border-top: 1px solid rgba(148, 163, 184, 0.15) !important;
+    backdrop-filter: blur(8px) !important;
+}
+
+/* ── Collapsed Sidebar ──────────────────────────────── */
+.fi-sidebar-collapsed .fi-sidebar-item-label,
+.fi-sidebar-collapsed .fi-sidebar-group-label {
+    opacity: 0 !important;
+}
+
+.fi-sidebar-collapsed .fi-sidebar-item-button {
+    justify-content: center !important;
+}
+
+/* ── Animations ─────────────────────────────────────── */
+/* Animations removed for better UX - no distracting effects */
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 1024px) {
+    .fi-sidebar {
+        box-shadow: 8px 0 32px rgba(0, 0, 0, 0.2) !important;
+    }
+}
+
+/* ── Dark Mode Enhancements ─────────────────────────── */
+.dark .fi-sidebar {
+    background: linear-gradient(180deg, #0f172a 0%, #020617 100%) !important;
+}
+
+.dark .fi-sidebar-item-button.fi-active {
+    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3) !important;
+}
+
+/* ── Light Mode Support ─────────────────────────────── */
+/* Light mode: sidebar putih, text hitam */
+html:not(.dark) .fi-sidebar {
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%) !important;
+    border-right: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+html:not(.dark) .fi-sidebar-header {
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+html:not(.dark) .fi-sidebar-header .fi-brand-name,
+html:not(.dark) .fi-sidebar-header a,
+html:not(.dark) .fi-sidebar-header span {
+    color: #0f172a !important;
+    text-shadow: none !important;
+}
+
+html:not(.dark) .fi-sidebar-group-label {
+    color: #475569 !important;
+}
+
+html:not(.dark) .fi-sidebar-group > button {
+    color: #334155 !important;
+}
+
+html:not(.dark) .fi-sidebar-item-label {
+    color: #334155 !important;
+}
+
+html:not(.dark) .fi-sidebar-item-icon {
+    color: #64748b !important;
+}
+
+/* Light mode: Submenu container */
+html:not(.dark) .fi-sidebar-group-items {
+    background: rgba(241, 245, 249, 0.6) !important;
+    border: 1px solid rgba(148, 163, 184, 0.15) !important;
+}
+
+/* Light mode: Submenu items */
+html:not(.dark) .fi-sidebar-group-items .fi-sidebar-item-button {
+    background: rgba(255, 255, 255, 0.5) !important;
+    border-left: 2px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+html:not(.dark) .fi-sidebar-group-items .fi-sidebar-item-label {
+    color: #475569 !important;
+}
+
+html:not(.dark) .fi-sidebar-group-items .fi-sidebar-item-icon {
+    color: #64748b !important;
+}
+
+/* Light mode: Submenu hover */
+html:not(.dark) .fi-sidebar-group-items .fi-sidebar-item:hover .fi-sidebar-item-button {
+    background: rgba(226, 232, 240, 0.8) !important;
+    border-left: 2px solid rgba(100, 116, 139, 0.4) !important;
+}
+
+html:not(.dark) .fi-sidebar-group-items .fi-sidebar-item:hover .fi-sidebar-item-label {
+    color: #1e293b !important;
+}
+
+/* Light mode: Submenu active */
+html:not(.dark) .fi-sidebar-group-items .fi-sidebar-item-button.sgc-active {
+    background: linear-gradient(135deg, rgba(226, 232, 240, 1) 0%, rgba(203, 213, 225, 0.95) 100%) !important;
+    border-left: 4px solid #22c55e !important;
+}
+
+html:not(.dark) .fi-sidebar-group-items .fi-sidebar-item-button.sgc-active .fi-sidebar-item-label {
+    color: #0f172a !important;
+}
+
+html:not(.dark) .fi-sidebar-group-items .fi-sidebar-item-button.sgc-active .fi-sidebar-item-icon {
+    color: #16a34a !important;
+}
+
+/* Light mode: Parent group active */
+html:not(.dark) .fi-sidebar-group.sgc-group-active > button {
+    background: rgba(219, 234, 254, 0.6) !important;
+    color: #1e40af !important;
+    border-left: 3px solid rgba(59, 130, 246, 0.4) !important;
+}
+
+html:not(.dark) .fi-sidebar-group.sgc-group-active > button svg {
+    color: #16a34a !important;
+}
+
+html:not(.dark) .fi-sidebar-group.sgc-group-active .fi-sidebar-group-items {
+    background: rgba(241, 245, 249, 0.8) !important;
+    border: 1px solid rgba(59, 130, 246, 0.15) !important;
+}
+
+html:not(.dark) .fi-sidebar-footer {
+    background: rgba(255, 255, 255, 0.9) !important;
+    border-top: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
