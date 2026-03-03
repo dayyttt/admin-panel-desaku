@@ -1,8 +1,14 @@
 <!-- Sidebar Search Component -->
 <div id="sgc-sidebar-search" class="sgc-search-container" style="display: none;">
     <div class="sgc-search-wrapper">
-        <svg class="sgc-search-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <svg class="sgc-search-icon" 
+             xmlns="http://www.w3.org/2000/svg" 
+             fill="none" 
+             viewBox="0 0 24 24" 
+             stroke-width="1.5" 
+             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            <span class="sgc-search-icon-tooltip">Cari Menu (Ctrl+K)</span>
         </svg>
         <input 
             type="text" 
@@ -25,12 +31,27 @@
 .sgc-search-container {
     padding: 0.75rem;
     border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+    transition: all 0.3s ease;
+}
+
+/* Collapsed state - center the icon */
+.sgc-search-container.collapsed {
+    display: flex;
+    justify-content: center;
+    padding: 0.5rem;
 }
 
 .sgc-search-wrapper {
     position: relative;
     display: flex;
     align-items: center;
+    width: 100%;
+    transition: all 0.3s ease;
+}
+
+/* Collapsed state - show only icon button */
+.sgc-search-container.collapsed .sgc-search-wrapper {
+    width: auto;
 }
 
 .sgc-search-icon {
@@ -40,6 +61,74 @@
     height: 1.25rem;
     color: #94a3b8;
     pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+/* Collapsed state - make icon clickable and bigger */
+.sgc-search-container.collapsed .sgc-search-icon {
+    position: static;
+    width: 2.5rem;
+    height: 2.5rem;
+    pointer-events: auto;
+    cursor: pointer;
+    padding: 0.625rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.sgc-search-container.collapsed .sgc-search-icon:hover {
+    background: rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    transform: scale(1.05);
+}
+
+.sgc-search-container.collapsed .sgc-search-icon:active {
+    transform: scale(0.95);
+}
+
+/* Tooltip for collapsed icon */
+.sgc-search-icon-tooltip {
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    margin-left: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: rgba(15, 23, 42, 0.95);
+    color: #f1f5f9;
+    font-size: 0.875rem;
+    border-radius: 0.375rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 50;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.sgc-search-icon-tooltip::before {
+    content: '';
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border: 6px solid transparent;
+    border-right-color: rgba(15, 23, 42, 0.95);
+}
+
+.sgc-search-container.collapsed .sgc-search-icon:hover .sgc-search-icon-tooltip {
+    opacity: 1;
+}
+
+/* Light mode tooltip */
+html:not(.dark) .sgc-search-icon-tooltip {
+    background: rgba(15, 23, 42, 0.9);
+    color: #f1f5f9;
+}
+
+html:not(.dark) .sgc-search-icon-tooltip::before {
+    border-right-color: rgba(15, 23, 42, 0.9);
 }
 
 .sgc-search-input {
@@ -50,7 +139,15 @@
     border-radius: 0.5rem;
     color: #f1f5f9;
     font-size: 0.875rem;
-    transition: all 0.2s ease;
+    transition: all 0.3s ease;
+}
+
+/* Collapsed state - hide input */
+.sgc-search-container.collapsed .sgc-search-input {
+    width: 0;
+    padding: 0;
+    opacity: 0;
+    border: none;
 }
 
 .sgc-search-input:focus {
@@ -74,6 +171,11 @@
     color: #94a3b8;
     cursor: pointer;
     transition: all 0.2s ease;
+}
+
+/* Collapsed state - hide clear button */
+.sgc-search-container.collapsed .sgc-search-clear {
+    display: none !important;
 }
 
 .sgc-search-clear:hover {
@@ -277,7 +379,7 @@ html:not(.dark) .sgc-search-clear:hover {
         // Check if already injected
         const existingSearch = sidebar.parentElement.querySelector('#sgc-sidebar-search');
         if (existingSearch && existingSearch.style.display !== 'none') {
-            console.log('SGC Search: Already initialized');
+            // console.log('SGC Search: Already initialized');
             return;
         }
         
@@ -292,12 +394,13 @@ html:not(.dark) .sgc-search-clear:hover {
         if (sidebar.parentElement) {
             sidebar.parentElement.insertBefore(searchContainer, sidebar);
             searchContainer.style.display = 'block';
-            console.log('SGC Search: Injected into sidebar');
+            // console.log('SGC Search: Injected into sidebar');
         }
         
         const searchInput = document.getElementById('sgc-menu-search');
         const searchClear = document.getElementById('sgc-search-clear');
         const searchResults = document.getElementById('sgc-search-results');
+        const searchIcon = searchContainer.querySelector('.sgc-search-icon');
         
         if (!searchInput) {
             setTimeout(initSidebarSearch, 500);
@@ -306,6 +409,106 @@ html:not(.dark) .sgc-search-clear:hover {
         
         let menuItems = [];
         let selectedIndex = -1;
+        
+        // Check sidebar collapse state using Alpine store
+        function checkSidebarState() {
+            // Check if Alpine is available
+            if (typeof Alpine !== 'undefined' && Alpine.store && Alpine.store('sidebar')) {
+                const isOpen = Alpine.store('sidebar').isOpen;
+                // console.log('SGC Search: Alpine sidebar state - isOpen:', isOpen);
+                if (!isOpen) {
+                    searchContainer.classList.add('collapsed');
+                } else {
+                    searchContainer.classList.remove('collapsed');
+                }
+            } else {
+                // Fallback: check by class or width
+                const sidebarElement = document.querySelector('.fi-sidebar');
+                if (sidebarElement) {
+                    const width = sidebarElement.offsetWidth;
+                    // Collapsed sidebar is usually around 80px or less
+                    if (width < 100) {
+                        searchContainer.classList.add('collapsed');
+                    } else {
+                        searchContainer.classList.remove('collapsed');
+                    }
+                }
+            }
+        }
+        
+        // Handle icon click when collapsed
+        if (searchIcon) {
+            searchIcon.addEventListener('click', function(e) {
+                const isCollapsed = searchContainer.classList.contains('collapsed');
+                
+                if (isCollapsed) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Expand sidebar using Alpine store
+                    if (typeof Alpine !== 'undefined' && Alpine.store && Alpine.store('sidebar')) {
+                        Alpine.store('sidebar').isOpen = true;
+                        
+                        // Wait for sidebar animation to complete, then focus input
+                        setTimeout(() => {
+                            searchContainer.classList.remove('collapsed');
+                            searchInput.focus();
+                            // console.log('SGC Search: Input focused');
+                        }, 350);
+                    } else {
+                        // Fallback: try to find and click toggle button
+                        // console.log('SGC Search: Alpine not available, trying toggle button');
+                        const toggleButton = document.querySelector('[x-on\\:click*="sidebar"]') || 
+                                           document.querySelector('button[aria-label*="sidebar"]') ||
+                                           document.querySelector('.fi-sidebar-close-button');
+                        
+                        if (toggleButton) {
+                            toggleButton.click();
+                            setTimeout(() => {
+                                searchInput.focus();
+                            }, 350);
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Watch for sidebar state changes using multiple methods
+        
+        // Method 1: Watch Alpine store (if available)
+        if (typeof Alpine !== 'undefined') {
+            document.addEventListener('alpine:init', () => {
+                if (Alpine.store && Alpine.store('sidebar')) {
+                    Alpine.effect(() => {
+                        checkSidebarState();
+                    });
+                }
+            });
+        }
+        
+        // Method 2: Watch for class changes on sidebar
+        const observer = new MutationObserver(function(mutations) {
+            checkSidebarState();
+        });
+        
+        const sidebarElement = document.querySelector('.fi-sidebar');
+        if (sidebarElement) {
+            observer.observe(sidebarElement, { 
+                attributes: true, 
+                attributeFilter: ['class', 'style'] 
+            });
+        }
+        
+        // Method 3: Watch for window resize (sidebar might change on resize)
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(checkSidebarState, 100);
+        });
+        
+        // Initial check
+        setTimeout(checkSidebarState, 100);
+        setTimeout(checkSidebarState, 500); // Double check after delay
         
         // Collect all menu items
         function collectMenuItems() {
@@ -355,7 +558,7 @@ html:not(.dark) .sgc-search-clear:hover {
                 });
             });
             
-            console.log('SGC Search: Collected', menuItems.length, 'menu items');
+            // console.log('SGC Search: Collected', menuItems.length, 'menu items');
         }
         
         // Search and display results
@@ -464,7 +667,7 @@ html:not(.dark) .sgc-search-clear:hover {
             if (isCollapsed) {
                 // Click to expand
                 groupButton.click();
-                console.log('SGC Search: Expanded parent group');
+                // console.log('SGC Search: Expanded parent group');
             }
         }
         
@@ -472,7 +675,7 @@ html:not(.dark) .sgc-search-clear:hover {
         function storeExpandState(href) {
             try {
                 localStorage.setItem('sgc_expand_for_url', href);
-                console.log('SGC Search: Stored expand state for', href);
+                // console.log('SGC Search: Stored expand state for', href);
             } catch (e) {
                 console.error('SGC Search: Failed to store expand state', e);
             }
@@ -497,7 +700,7 @@ html:not(.dark) .sgc-search-clear:hover {
                                 const groupButton = parentGroup.querySelector(':scope > button');
                                 if (groupButton && groupButton.getAttribute('aria-expanded') === 'false') {
                                     groupButton.click();
-                                    console.log('SGC Search: Auto-expanded parent on page load');
+                                    // console.log('SGC Search: Auto-expanded parent on page load');
                                 }
                             }
                         }
@@ -612,7 +815,7 @@ html:not(.dark) .sgc-search-clear:hover {
         collectMenuItems();
         checkExpandState(); // Check if we need to expand parent on page load
         
-        console.log('SGC Search: Initialized');
+        // console.log('SGC Search: Initialized');
     }
     
     // Start

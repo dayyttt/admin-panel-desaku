@@ -29,6 +29,8 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login(Login::class)
             ->brandName('SGC Desa Lesane')
+            ->databaseNotifications(false) // Disable database notifications polling
+            ->databaseNotificationsPolling(null) // Disable polling
             ->colors([
                 'primary' => Color::Green,
                 'danger' => Color::Red,
@@ -58,6 +60,7 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
             ])
+            ->spa() // Enable SPA mode to reduce full page reloads
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -74,7 +77,11 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->renderHook(
                 'panels::body.end',
-                fn (): string => view('components.tour-script')->render() . view('components.sidebar-active-fix')->render() . view('components.sidebar-search')->render()
+                fn (): string => view('components.tour-script')->render()
+                // Temporarily disabled for performance testing
+                // . view('components.sidebar-active-fix')->render() 
+                // . view('components.sidebar-search')->render() 
+                // . view('components.topbar-custom')->render()
             )
             ->renderHook(
                 'panels::head.end',
