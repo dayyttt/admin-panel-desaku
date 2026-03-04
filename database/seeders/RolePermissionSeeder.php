@@ -112,7 +112,7 @@ class RolePermissionSeeder extends Seeder
         ];
 
         foreach ($permissions as $permission) {
-            Permission::create(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
         // ========================================
@@ -120,12 +120,12 @@ class RolePermissionSeeder extends Seeder
         // ========================================
 
         // 1. SUPERADMIN - Full Access
-        $superadmin = Role::create(['name' => 'superadmin']);
-        $superadmin->givePermissionTo(Permission::all());
+        $superadmin = Role::firstOrCreate(['name' => 'superadmin']);
+        $superadmin->syncPermissions(Permission::all());
 
         // 2. OPERATOR - Operational Access
-        $operator = Role::create(['name' => 'operator']);
-        $operator->givePermissionTo([
+        $operator = Role::firstOrCreate(['name' => 'operator']);
+        $operator->syncPermissions([
             // Kependudukan - Full
             'view_penduduk', 'create_penduduk', 'edit_penduduk', 'delete_penduduk', 'export_penduduk',
             'view_keluarga', 'create_keluarga', 'edit_keluarga', 'delete_keluarga',
@@ -164,8 +164,8 @@ class RolePermissionSeeder extends Seeder
         ]);
 
         // 3. KEPALA DESA - View & Approve Only
-        $kepalaDesa = Role::create(['name' => 'kepala_desa']);
-        $kepalaDesa->givePermissionTo([
+        $kepalaDesa = Role::firstOrCreate(['name' => 'kepala_desa']);
+        $kepalaDesa->syncPermissions([
             // Kependudukan - View Only
             'view_penduduk', 'view_keluarga', 'view_kelahiran', 'view_kematian',
             

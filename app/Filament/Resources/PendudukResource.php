@@ -111,6 +111,7 @@ class PendudukResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['keluarga', 'wilayahRt']))
             ->columns([
                 Tables\Columns\TextColumn::make('nik')->label('NIK')->searchable()->copyable(),
                 Tables\Columns\TextColumn::make('nama')->searchable()->weight('bold')->sortable(),

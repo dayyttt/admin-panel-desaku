@@ -62,6 +62,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->spa() // Enable SPA mode to reduce full page reloads
             ->middleware([
+                \App\Http\Middleware\CheckInstalled::class,
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
