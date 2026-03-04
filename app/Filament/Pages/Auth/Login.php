@@ -3,68 +3,33 @@
 namespace App\Filament\Pages\Auth;
 
 use Filament\Forms\Components\Component;
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Form;
 use Filament\Pages\Auth\Login as BaseLogin;
-use Illuminate\Validation\ValidationException;
+use MarcoGermani87\FilamentCaptcha\Forms\Components\CaptchaField;
 
 class Login extends BaseLogin
 {
-    /**
-     * Override form untuk support login dengan email atau username
-     */
-    protected function getForms(): array
+    public function form(Form $form): Form
     {
-        return [
-            'form' => $this->form(
-                $this->makeForm()
-                    ->schema([
-                        $this->getLoginFormComponent(),
-                        $this->getPasswordFormComponent(),
-                        $this->getRememberFormComponent(),
-                    ])
-                    ->statePath('data'),
-            ),
-        ];
+        return $form
+            ->schema([
+                $this->getEmailFormComponent(),
+                $this->getPasswordFormComponent(),
+                $this->getCaptchaFormComponent(),
+                $this->getRememberFormComponent(),
+            ])
+            ->statePath('data');
     }
 
-    /**
-     * Custom login field yang support email atau username
-     */
-    protected function getLoginFormComponent(): Component
+    protected function getCaptchaFormComponent(): Component
     {
-        return TextInput::make('login')
-            ->label('Email atau Username')
+        return CaptchaField::make('captcha')
+            ->label('Kode Keamanan')
             ->required()
-            ->autocomplete()
-            ->autofocus()
-            ->extraInputAttributes(['tabindex' => 1])
-            ->placeholder('Masukkan email atau username');
-    }
-
-    /**
-     * Override credentials untuk support email atau username
-     */
-    protected function getCredentialsFromFormData(array $data): array
-    {
-        $login = $data['login'] ?? null;
-        $password = $data['password'] ?? null;
-
-        // Cek apakah input adalah email atau username
-        $loginType = filter_var($login, FILTER_VALIDATE_EMAIL) ? 'email' : 'username';
-
-        return [
-            $loginType => $login,
-            'password' => $password,
-        ];
-    }
-
-    /**
-     * Custom error message
-     */
-    protected function throwFailureValidationException(): never
-    {
-        throw ValidationException::withMessages([
-            'data.login' => __('Email/username atau password salah.'),
-        ]);
+            ->validationMessages([
+                'captcha' => 'Kode keamanan tidak valid.',
+                'required' => 'Kode keamanan wajib diisi.',
+            ])
+            ->helperText('Masukkan kode yang terlihat pada gambar');
     }
 }
