@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\User;
-use App\Models\DesaInfo;
+use App\Models\DesaConfig;
 
 class InstallController extends Controller
 {
@@ -161,20 +161,17 @@ class InstallController extends Controller
             // Run migrations
             Artisan::call('migrate', ['--force' => true]);
 
-            // Create or update desa info
+            // Create or update desa config
             $desaInfo = session('desa_info');
-            DesaInfo::updateOrCreate(
-                ['key' => 'profil_desa'],
+            DesaConfig::updateOrCreate(
+                ['id' => 1], // Only one config record
                 [
-                    'data' => [
-                        'nama_desa' => $desaInfo['nama_desa'],
-                        'kode_desa' => $desaInfo['kode_desa'],
-                        'kecamatan' => $desaInfo['kecamatan'],
-                        'kabupaten' => $desaInfo['kabupaten'],
-                        'provinsi' => $desaInfo['provinsi'],
-                        'kode_pos' => $desaInfo['kode_pos'] ?? null,
-                    ],
-                    'aktif' => true,
+                    'nama_desa' => $desaInfo['nama_desa'],
+                    'kode_desa' => $desaInfo['kode_desa'],
+                    'nama_kecamatan' => $desaInfo['kecamatan'],
+                    'nama_kabupaten' => $desaInfo['kabupaten'],
+                    'nama_provinsi' => $desaInfo['provinsi'],
+                    'kode_pos' => $desaInfo['kode_pos'] ?? null,
                 ]
             );
 

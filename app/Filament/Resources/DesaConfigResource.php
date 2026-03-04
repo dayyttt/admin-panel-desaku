@@ -57,9 +57,18 @@ class DesaConfigResource extends Resource
                 ])->columns(2),
 
                 Forms\Components\Tabs\Tab::make('Lokasi & Tampilan')->schema([
+                    Forms\Components\FileUpload::make('logo_path')
+                        ->label('Logo Desa')
+                        ->image()
+                        ->directory('logo')
+                        ->disk('public')
+                        ->imageEditor()
+                        ->imageEditorAspectRatios(['1:1'])
+                        ->maxSize(2048)
+                        ->helperText('Upload logo desa (format: PNG/JPG, maksimal 2MB, rasio 1:1)')
+                        ->columnSpanFull(),
                     Forms\Components\TextInput::make('latitude')->numeric(),
                     Forms\Components\TextInput::make('longitude')->numeric(),
-                    Forms\Components\FileUpload::make('logo_path')->image()->directory('logo')->label('Logo Desa'),
                     Forms\Components\FileUpload::make('foto_kantor_path')->image()->directory('kantor')->label('Foto Kantor'),
                     Forms\Components\ColorPicker::make('tema_warna'),
                 ])->columns(2),
