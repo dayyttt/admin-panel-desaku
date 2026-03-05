@@ -22,13 +22,13 @@ class SuratJenisSeeder extends Seeder
         // Create Kategori
         $this->createKategori();
         
-        // Create 20 Jenis Surat
+        // Create 40 Jenis Surat
         $this->createJenisSurat();
 
         $this->command->newLine();
         $this->command->info('🎉 Surat Jenis Seeder Completed!');
-        $this->command->info('📊 Total Kategori: 4');
-        $this->command->info('📊 Total Jenis Surat: 20');
+        $this->command->info('📊 Total Kategori: 7');
+        $this->command->info('📊 Total Jenis Surat: 40');
     }
 
     private function createKategori()
@@ -39,23 +39,29 @@ class SuratJenisSeeder extends Seeder
             ['nama' => 'Administrasi Kependudukan', 'kode' => 'ADM-KDP', 'deskripsi' => 'Surat terkait kependudukan (KTP, KK, Kelahiran, Kematian, dll)', 'urutan' => 1],
             ['nama' => 'Administrasi Umum', 'kode' => 'ADM-UMM', 'deskripsi' => 'Surat keterangan umum (SKU, SKTM, SKCK, dll)', 'urutan' => 2],
             ['nama' => 'Administrasi Nikah', 'kode' => 'ADM-NKH', 'deskripsi' => 'Surat pengantar nikah (N1, N2, N4)', 'urutan' => 3],
-            ['nama' => 'Lain-lain', 'kode' => 'LAIN', 'deskripsi' => 'Surat lainnya', 'urutan' => 4],
+            ['nama' => 'Pertanahan', 'kode' => 'ADM-TNH', 'deskripsi' => 'Surat terkait tanah dan properti', 'urutan' => 4],
+            ['nama' => 'Bantuan & Sosial', 'kode' => 'ADM-BNT', 'deskripsi' => 'Surat rekomendasi bantuan sosial, BPJS, beasiswa, UMKM', 'urutan' => 5],
+            ['nama' => 'Khusus & Lainnya', 'kode' => 'ADM-KHS', 'deskripsi' => 'Surat izin keramaian, IMB, rekomendasi kegiatan', 'urutan' => 6],
+            ['nama' => 'Lain-lain', 'kode' => 'LAIN', 'deskripsi' => 'Surat lainnya', 'urutan' => 7],
         ];
 
         foreach ($kategoris as $kat) {
             SuratKategori::create($kat);
         }
         
-        $this->command->info('   ✅ 4 Kategori created');
+        $this->command->info('   ✅ 7 Kategori created');
     }
 
     private function createJenisSurat()
     {
-        $this->command->info('📄 Creating 20 Jenis Surat...');
+        $this->command->info('📄 Creating 40 Jenis Surat...');
         
         $kdp = SuratKategori::where('kode', 'ADM-KDP')->first()->id;
         $umm = SuratKategori::where('kode', 'ADM-UMM')->first()->id;
         $nkh = SuratKategori::where('kode', 'ADM-NKH')->first()->id;
+        $tnh = SuratKategori::where('kode', 'ADM-TNH')->first()->id;
+        $bnt = SuratKategori::where('kode', 'ADM-BNT')->first()->id;
+        $khs = SuratKategori::where('kode', 'ADM-KHS')->first()->id;
         $lain = SuratKategori::where('kode', 'LAIN')->first()->id;
 
         $jenisSurat = [];
@@ -584,6 +590,6 @@ class SuratJenisSeeder extends Seeder
             SuratJenis::create($surat);
         }
         
-        $this->command->info('   ✅ 20 Jenis Surat created');
+        $this->command->info('   ✅ 40 Jenis Surat created');
     }
 }

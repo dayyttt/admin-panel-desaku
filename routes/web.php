@@ -24,3 +24,6 @@ Route::middleware('check.installed')->group(function () {
         return view('welcome');
     });
 });
+
+// Surat Verification (Public)
+Route::get('/verifikasi/{kode}', [\App\Http\Controllers\PublicSuratController::class, 'verify'])->name('surat.verifikasi');

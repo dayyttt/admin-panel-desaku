@@ -34,13 +34,15 @@ class SuratArsipResource extends Resource
                     ->searchable()->preload()->required()
                     ->label('Jenis Surat')
                     ->reactive()
-                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                    ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
                         if ($state) {
                             $jenis = SuratJenis::find($state);
                             if ($jenis) {
                                 $set('nomor_surat', $jenis->generateNomorSurat());
                             }
                         }
+                        // Reset data_surat when jenis changes
+                        $set('data_surat', null);
                     }),
                 Forms\Components\TextInput::make('nomor_surat')->required()->unique(ignoreRecord: true),
                 Forms\Components\DatePicker::make('tanggal_surat')->required()->default(now()),
@@ -48,23 +50,92 @@ class SuratArsipResource extends Resource
 
             Forms\Components\Section::make('Data Pemohon')->schema([
                 Forms\Components\Select::make('penduduk_id')
-                    ->label('Pilih Penduduk')
+                    ->label('Pilih Penduduk (Opsional)')
                     ->options(Penduduk::query()->pluck('nama', 'id'))
                     ->searchable()->preload()
                     ->reactive()
-                    ->afterStateUpdated(function ($state, Forms\Set $set) {
+                    ->afterStateUpdated(function ($state, Forms\Set $set, Forms\Get $get) {
                         if ($state) {
                             $p = Penduduk::find($state);
                             if ($p) {
                                 $set('nik_pemohon', $p->nik);
                                 $set('nama_pemohon', $p->nama);
+                                
+                                // Auto-fill data_surat dari penduduk
+                                $dataSurat = $get('data_surat') ?? [];
+                                $dataSurat['nik'] = $p->nik;
+                                $dataSurat['nama_pemohon'] = $p->nama;
+                                $dataSurat['tempat_lahir'] = $p->tempat_lahir;
+                                $dataSurat['tanggal_lahir'] = $p->tanggal_lahir;
+                                $dataSurat['jenis_kelamin'] = $p->jenis_kelamin;
+                                $dataSurat['agama'] = $p->agama;
+                                $dataSurat['pekerjaan'] = $p->pekerjaan;
+                                $dataSurat['alamat'] = $p->alamat;
+                                $dataSurat['rt'] = $p->rt;
+                                $dataSurat['rw'] = $p->rw;
+                                $dataSurat['dusun'] = $p->dusun;
+                                $set('data_surat', $dataSurat);
                             }
                         }
-                    }),
-                Forms\Components\TextInput::make('nik_pemohon')->maxLength(16)->label('NIK'),
-                Forms\Components\TextInput::make('nama_pemohon')->required(),
-                Forms\Components\Textarea::make('keperluan')->rows(2),
+                    })
+                    ->helperText('Pilih dari database penduduk untuk auto-fill data'),
+                Forms\Components\TextInput::make('nik_pemohon')->maxLength(16)->label('NIK')->required(),
+                Forms\Components\TextInput::make('nama_pemohon')->required()->label('Nama Lengkap'),
+                Forms\Components\Textarea::make('keperluan')->rows(2)->label('Keperluan Surat'),
             ])->columns(2),
+
+            // FORM DINAMIS - Generate berdasarkan variabel jenis surat
+            Forms\Components\Section::make('Data Detail Surat')
+                ->schema(function (Forms\Get $get): array {
+                    $suratJenisId = $get('surat_jenis_id');
+                    
+                    if (!$suratJenisId) {
+                        return [
+                            Forms\Components\Placeholder::make('info')
+                                ->content('Pilih jenis surat terlebih dahulu untuk menampilkan form detail.')
+                                ->columnSpanFull(),
+                        ];
+                    }
+                    
+                    $jenis = SuratJenis::find($suratJenisId);
+                    
+                    if (!$jenis || !$jenis->variabel) {
+                        return [
+                            Forms\Components\Placeholder::make('info')
+                                ->content('Jenis surat ini tidak memiliki variabel tambahan.')
+                                ->columnSpanFull(),
+                        ];
+                    }
+                    
+                    $fields = [];
+                    
+                    foreach ($jenis->variabel as $key => $label) {
+                        // Skip field yang sudah ada di section Data Pemohon
+                        if (in_array($key, ['nik', 'nama_pemohon', 'keperluan'])) {
+                            continue;
+                        }
+                        
+                        // Generate field berdasarkan nama variabel
+                        $field = self::generateFieldFromVariable($key, $label);
+                        
+                        if ($field) {
+                            $fields[] = $field;
+                        }
+                    }
+                    
+                    if (empty($fields)) {
+                        return [
+                            Forms\Components\Placeholder::make('info')
+                                ->content('Semua data sudah terisi di section Data Pemohon.')
+                                ->columnSpanFull(),
+                        ];
+                    }
+                    
+                    return $fields;
+                })
+                ->columns(2)
+                ->collapsible()
+                ->collapsed(false),
 
             Forms\Components\Section::make('TTD & Verifikasi')->schema([
                 Forms\Components\Select::make('ttd_id')
@@ -78,7 +149,79 @@ class SuratArsipResource extends Resource
             ])->columns(2)->collapsed(),
 
             Forms\Components\Hidden::make('dibuat_oleh')->default(fn () => Auth::id()),
+            Forms\Components\Hidden::make('data_surat'),
         ]);
+    }
+    
+    /**
+     * Generate form field berdasarkan nama variabel
+     */
+    private static function generateFieldFromVariable(string $key, string $label)
+    {
+        // Field tanggal
+        if (str_contains($key, 'tanggal') || str_contains($key, '_lahir') && str_contains($key, 'tanggal')) {
+            return Forms\Components\DatePicker::make("data_surat.{$key}")
+                ->label($label)
+                ->displayFormat('d/m/Y');
+        }
+        
+        // Field jenis kelamin
+        if (str_contains($key, 'jenis_kelamin')) {
+            return Forms\Components\Select::make("data_surat.{$key}")
+                ->label($label)
+                ->options([
+                    'L' => 'Laki-laki',
+                    'P' => 'Perempuan',
+                ]);
+        }
+        
+        // Field agama
+        if (str_contains($key, 'agama')) {
+            return Forms\Components\Select::make("data_surat.{$key}")
+                ->label($label)
+                ->options([
+                    'Islam' => 'Islam',
+                    'Kristen' => 'Kristen',
+                    'Katolik' => 'Katolik',
+                    'Hindu' => 'Hindu',
+                    'Buddha' => 'Buddha',
+                    'Konghucu' => 'Konghucu',
+                ]);
+        }
+        
+        // Field status pernikahan
+        if (str_contains($key, 'status') && (str_contains($label, 'nikah') || str_contains($label, 'kawin'))) {
+            return Forms\Components\Select::make("data_surat.{$key}")
+                ->label($label)
+                ->options([
+                    'Belum Kawin' => 'Belum Kawin',
+                    'Kawin' => 'Kawin',
+                    'Cerai Hidup' => 'Cerai Hidup',
+                    'Cerai Mati' => 'Cerai Mati',
+                ]);
+        }
+        
+        // Field textarea untuk field panjang
+        if (str_contains($key, 'alamat') || str_contains($key, 'keterangan') || 
+            str_contains($key, 'alasan') || str_contains($key, 'kronologi') ||
+            str_contains($key, 'deskripsi') || str_contains($key, 'isi_')) {
+            return Forms\Components\Textarea::make("data_surat.{$key}")
+                ->label($label)
+                ->rows(3);
+        }
+        
+        // Field number untuk angka
+        if (str_contains($key, 'jumlah') || str_contains($key, 'luas') || 
+            str_contains($key, 'penghasilan') || str_contains($key, 'harga') ||
+            str_contains($key, 'umur') || str_contains($key, 'tahun')) {
+            return Forms\Components\TextInput::make("data_surat.{$key}")
+                ->label($label)
+                ->numeric();
+        }
+        
+        // Default: TextInput
+        return Forms\Components\TextInput::make("data_surat.{$key}")
+            ->label($label);
     }
 
     public static function table(Table $table): Table
@@ -182,10 +325,24 @@ class SuratArsipResource extends Resource
                         }
                     }),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+            ])
+            ->bulkActions([
+                Tables\Actions\BulkActionGroup::make([
+                    Tables\Actions\DeleteBulkAction::make(),
+                ]),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('surat_jenis_id')
                     ->relationship('suratJenis', 'nama')->label('Jenis Surat'),
+            ])
+            ->emptyStateHeading('Belum ada surat')
+            ->emptyStateDescription('Klik tombol "Buat Surat Baru" untuk membuat surat pertama.')
+            ->emptyStateIcon('heroicon-o-document-text')
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make()
+                    ->label('Buat Surat Baru')
+                    ->icon('heroicon-o-plus-circle'),
             ])
             ->defaultSort('tanggal_surat', 'desc');
     }

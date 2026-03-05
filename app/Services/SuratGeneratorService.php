@@ -16,6 +16,11 @@ class SuratGeneratorService
      */
     public function generateSurat(SuratArsip $surat): string
     {
+        // Langsung pakai template Blade untuk hasil yang lebih bagus
+        // Skip .docx conversion karena hasilnya jelek
+        return $this->generateFromBlade($surat);
+        
+        /* DISABLED: .docx conversion menghasilkan PDF jelek
         $jenis = $surat->suratJenis;
         
         // 1. Cek apakah ada template
@@ -75,6 +80,7 @@ class SuratGeneratorService
         @unlink($tempDocx);
 
         return $pdfPath;
+        */
     }
 
     /**
@@ -111,9 +117,13 @@ class SuratGeneratorService
             ]);
         }
 
-        // Data dari data_surat (JSON)
+        // Data dari data_surat (JSON) - exclude keys yang sudah di-format dari penduduk
         if ($surat->data_surat && is_array($surat->data_surat)) {
-            $data = array_merge($data, $surat->data_surat);
+            $protectedKeys = ['tanggal_lahir', 'jenis_kelamin', 'nama', 'nik', 'tempat_lahir', 'agama', 'pekerjaan'];
+            $extraData = $penduduk 
+                ? array_diff_key($surat->data_surat, array_flip($protectedKeys))
+                : $surat->data_surat;
+            $data = array_merge($data, $extraData);
         }
 
         // Data TTD
@@ -125,11 +135,17 @@ class SuratGeneratorService
             $data['jabatan_ttd'] = 'Kepala Desa';
         }
 
-        // Data desa
-        $data['nama_desa'] = 'Lesane';
-        $data['kecamatan'] = 'Kota Masohi';
-        $data['kabupaten'] = 'Maluku Tengah';
-        $data['provinsi'] = 'Maluku';
+        // Data desa (Dinamis dari database)
+        $desaInfo = \App\Models\DesaInfo::where('key', 'profil')->first();
+        $profil = $desaInfo ? $desaInfo->data : [];
+
+        $data['nama_desa'] = $profil['nama'] ?? 'Desa';
+        // Buang kata "Desa " dari nama desa jika ada (misal "Desa Lesane" -> "Lesane")
+        $data['nama_desa_clean'] = str_replace('Desa ', '', $data['nama_desa']);
+        $data['kecamatan'] = $profil['kecamatan'] ?? 'Kecamatan';
+        $data['kabupaten'] = $profil['kabupaten'] ?? 'Kabupaten';
+        $data['provinsi'] = $profil['provinsi'] ?? 'Provinsi';
+        $data['alamat_desa'] = "Alamat: " . $data['nama_desa'] . ", Kec. " . $data['kecamatan'] . ", Kab. " . $data['kabupaten'] . ", Prov. " . $data['provinsi'];
 
         return $data;
     }
@@ -171,7 +187,9 @@ class SuratGeneratorService
         $fullPath = storage_path('app/public/' . $qrCodePath);
         
         // URL verifikasi
-        $verifyUrl = config('app.url') . '/verifikasi/' . $surat->qr_code;
+        // Gunakan VITE_APP_URL atau FRONTEND_URL dari .env jika ada (misal web React/Vue/NextJS)
+        $baseUrl = env('FRONTEND_URL', config('app.url'));
+        $verifyUrl = $baseUrl . '/verifikasi/' . $surat->qr_code;
         
         // Generate QR code as SVG (tidak perlu imagick)
         $qrCode = QrCode::format('svg')
@@ -282,8 +300,9 @@ class SuratGeneratorService
     protected function generatePdf(string $html, SuratArsip $surat): string
     {
         $pdf = Pdf::loadHTML($html)
-            ->setPaper('a4', 'portrait')
-            ->setOption('enable-local-file-access', true);
+            ->setPaper([0, 0, 595.28, 841.89], 'portrait') // A4 in points: 210mm x 297mm
+            ->setOption('enable-local-file-access', true)
+            ->setOption('dpi', 96);
 
         $pdfDir = storage_path('app/public/surat-pdf');
         if (!File::exists($pdfDir)) {
@@ -309,15 +328,16 @@ class SuratGeneratorService
         $qrCodePath = $this->generateQrCode($surat);
         $qrCodeFullPath = storage_path('app/public/' . $qrCodePath);
         
-        // Baca SVG content
+        // Baca SVG content dan convert ke base64 agar DomPDF bisa me-render via tag <img>
         $qrCodeSvg = file_get_contents($qrCodeFullPath);
+        $qrCodeBase64 = base64_encode($qrCodeSvg);
         
         $pdf = Pdf::loadView('surat.template', [
             'surat' => $surat,
             'jenis' => $surat->suratJenis,
             'penduduk' => $surat->penduduk,
             'data' => $data,
-            'qrCode' => $qrCodeSvg,
+            'qrCode' => $qrCodeBase64,
         ])->setPaper('a4', 'portrait');
 
         $pdfDir = storage_path('app/public/surat-pdf');

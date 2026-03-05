@@ -29,7 +29,7 @@ class SuratController
     /** Verifikasi surat via kode unik */
     public function verifikasi(string $kode): JsonResponse
     {
-        $surat = SuratArsip::where('kode_verifikasi', $kode)->first();
+        $surat = SuratArsip::where('qr_code', $kode)->first();
 
         if (!$surat) {
             return response()->json(['valid' => false, 'message' => 'Surat tidak ditemukan'], 404);
